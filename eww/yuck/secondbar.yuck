@@ -1,0 +1,116 @@
+(defwidget secondworkspaces []
+  (literal
+    :content secondworkspaces
+  )
+)
+
+(defwidget secondmusic []
+  (eventbox
+    :onhover "eww update music-rev=${music-status == 'Stopped' ? false : true}"
+    :onhoverlost "eww update music-rev=false"
+    (box
+      :space-evenly false
+      :spacing 8
+      (eventbox
+        :cursor "pointer"
+        :class "eventbox"
+        :halign "center"
+        :vexpand true
+        :onhover "eww open-many secondplayer"
+        (button
+          :class "musicbar-art"
+          ;;:onclick "eww open-many --toggle player-closer player"
+          :style "background-image: url('${music-art}');"
+        )
+      )
+      (label
+        :class "musicbar-title"
+        :limit-width 32
+        :text music-title
+      )
+      (revealer
+        :transition "slideright"
+        :reveal music-rev
+        :duration "500ms"
+        (box
+          :spacing 10
+          (eventbox
+            :cursor "pointer"
+            (button
+              :class "musicbar-previous-icon"
+              :onclick "scripts/mediacontrol --prev"
+              ""
+            )
+          )
+          (eventbox
+            :cursor "pointer"
+            (button
+              :class "musicbar-toggle-icon"
+              :onclick "scripts/mediacontrol --toggle"
+              {music-status == "Playing" ? "" : music-status == "Paused" ? "" : ""}
+            )
+          )
+          (eventbox
+            :cursor "pointer"
+            (button
+              :class "musicbar-next-icon"
+              :onclick "scripts/mediacontrol --next"
+              ""
+            )
+          )
+        )
+      )
+    )
+  )
+)
+
+
+(defwidget secondleft []
+  (box
+    :space-evenly false
+    :halign "start"
+    :spacing 15
+    ;; (bsp-layout)
+    (secondworkspaces)
+    (windowtitle)
+  )
+)
+
+(defwidget secondcenter []
+  (box
+    :class "group"
+    :halign "center"
+    (secondmusic)
+  )
+)
+
+(defwidget secondright []
+  (box
+    :space-evenly false
+    :halign "end"
+    :spacing 15
+    ;;(notifications-icon)
+    (workspaces)
+    (eventbox :cursor "pointer"
+      (button :onclick "calendar" (clock))
+    )
+  )
+)
+
+(defwidget secondbar []
+  (box
+    :class "ewwbar"
+    (secondleft)
+    (secondcenter)
+    (secondright)
+  )
+)
+
+(defwindow secondbar
+  :wm-ignore false
+  :windowtype "dock"
+  ;; :reserve (struts :distance "60px" :side "top")
+  :monitor 0
+  :geometry (geometry :y "0.5%" :width "99%" :height "32px" :anchor "center top")
+  (secondbar)
+)

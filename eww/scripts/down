@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Run the speed test and extract download speed (in Mbps)
+eww update network-speed="testing speed.."
+# sleep 0.5
+output=$(speedtest-cli --simple)
+
+# Extract from the same output
+download=$(echo "$output" | grep 'Download' | awk '{print $2, $3}')
+upload=$(echo "$output" | grep 'Upload' | awk '{print $2, $3}')
+
+# Format: "Down: 42.00 Mbps | Up: 12.00 Mbps"
+#echo "$download and $upload"
+eww update network-speed="⬇️ $download | ⬆️ $upload"
+

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+LOCK=/tmp/eww_secondbar.lock
+if [ -f "$LOCK" ]; then
+    eww close secondbar > /dev/null
+    bspc config top_padding 3
+    dunstify -t 1000 --replace=1132 "Eww" "Second Bar closed..."
+    rm $LOCK
+else
+    eww open-many secondbar && bspc config -m eDP1 top_padding 42
+    dunstify -t 1000 --replace=1132 "Eww" "Second Bar launched..."
+    touch $LOCK
+fi

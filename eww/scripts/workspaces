@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Checks if a list ($1) contains an element ($2)
+contains() {
+  local hay=($1)
+  for e in "${hay[@]}"; do
+    [[ "$e" == "$2" ]] && echo 1 && return
+  done
+  echo 0
+}
+
+print_workspaces() {
+  buf=""
+  desktops="$(bspc query -m HDMI2 -D --names)"
+  focused_desktop="$(bspc query -m HDMI2 -D -d focused --names)"
+  occupied_desktops="$(bspc query -m HDMI2 -D -d .occupied --names)"
+  urgent_desktops="$(bspc query -m HDMI2 -D -d .urgent --names)"
+
+  for d in $desktops; do
+		if [[ "$focused_desktop" == "$d" ]]; then
+      ws=$d
+      icon=" "
+      class="focused"
+    elif [ "$(contains "$occupied_desktops" "$d")" -eq 1 ]; then
+      ws=$d
+      icon="󰪥 "
+      class="occupied"
+    elif [ "$(contains "$urgent_desktops" "$d")" -eq 1 ]; then
+      ws=$d
+      icon=" "
+      class="urgent"
+    else
+      ws=$d
+      icon=" "
+      class="empty"
+    fi
+
+    buf="$buf (eventbox :cursor \"pointer\" (button :class \"$class\" :onclick \"bspc desktop -f $ws\" \"$icon\"))"
+  done
+  echo "(box :class \"workspaces\" :hexpand true :vexpand true :spacing 15 $buf)"
+}
+
+# Listen to bspwm changes
+print_workspaces
+bspc subscribe desktop node_transfer | while read -r _; do
+  print_workspaces
+done
